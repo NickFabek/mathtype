@@ -1,0 +1,22 @@
+window.MathTypeConfig = {
+  baseFontSize: 22,
+  mathFontFamily: "STIX Two Math, Cambria Math, Times New Roman, serif",
+  uiFontFamily: "Avenir Next, Gill Sans, Trebuchet MS, sans-serif",
+  scriptScale: 0.7,
+  scriptMinSize: 8,
+  fracLineThickness: 0.06,
+  fracNumAlign: "center",
+  fracDenomAlign: "center",
+  matrixRowGap: 0.3,
+  matrixColGap: 0.4,
+  fencePadding: 0.1,
+  operatorSpacing: 0.16,
+  useOperatorSpacing: false,
+  useMunderover: true,
+  thinSpace: 0.1667,
+  mediumSpace: 0.2222,
+  thickSpace: 0.2778,
+  quad: 1,
+  qquad: 2,
+  displayMode: true
+};

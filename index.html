@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MathType Demo</title>
+  <style>
+    :root {
+      --ink: #1c1a19;
+      --paper: #f5efe7;
+      --accent: #c1442e;
+      --accent-2: #294e4a;
+      --panel: rgba(255, 255, 255, 0.8);
+      --shadow: 0 14px 40px rgba(28, 26, 25, 0.12);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 25%, rgba(193, 68, 46, 0.12), transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(41, 78, 74, 0.12), transparent 40%),
+        linear-gradient(135deg, #fbf6f0 0%, #f4ede3 100%);
+      font-family: "Avenir Next", "Gill Sans", "Trebuchet MS", sans-serif;
+    }
+
+    header {
+      padding: 32px 6vw 18px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 44px);
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .tagline {
+      max-width: 560px;
+      font-size: 15px;
+      opacity: 0.8;
+      margin: 8px 0 0;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) minmax(300px, 1fr);
+      gap: 24px;
+      padding: 12px 6vw 48px;
+    }
+
+    @media (max-width: 980px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+      max-height: calc(100vh - 220px);
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .control {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(28, 26, 25, 0.7);
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(28, 26, 25, 0.18);
+      font-size: 14px;
+      font-family: inherit;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      border: none;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 20px rgba(193, 68, 46, 0.25);
+    }
+
+    button.secondary {
+      background: var(--accent-2);
+      box-shadow: 0 10px 20px rgba(41, 78, 74, 0.2);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .preview {
+      display: grid;
+      gap: 18px;
+    }
+
+    .input-area {
+      display: grid;
+      gap: 10px;
+    }
+
+    .samples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .sample {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(41, 78, 74, 0.1);
+      border: 1px solid rgba(41, 78, 74, 0.3);
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .output {
+      padding: 20px;
+      border-radius: 16px;
+      background: white;
+      border: 1px solid rgba(28, 26, 25, 0.12);
+      min-height: 180px;
+      display: grid;
+      align-items: center;
+    }
+
+    .note {
+      font-size: 12px;
+      opacity: 0.65;
+    }
+
+    .mathml-debug {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(28, 26, 25, 0.2);
+      background: rgba(255, 255, 255, 0.6);
+      max-height: 240px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>MathType</h1>
+      <p class="tagline">Plain-JS LaTeX to MathML renderer with adjustable metrics. Tune spacing, sizing, and fence behavior, then export a config for reuse.</p>
+    </div>
+    <div class="button-row">
+      <button id="renderBtn">Render</button>
+      <button id="exportBtn" class="secondary">Export Config</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Metrics</h2>
+      <div class="controls" id="controls"></div>
+    </section>
+
+    <section class="panel preview">
+      <div class="input-area">
+        <label for="texInput">LaTeX Input</label>
+        <textarea id="texInput" rows="6"></textarea>
+        <div class="samples" id="samples"></div>
+      </div>
+
+      <div>
+        <label>Rendered Math</label>
+        <div class="output" id="preview"></div>
+      </div>
+
+      <div>
+        <label>MathML Output</label>
+        <div class="mathml-debug" id="mathmlOut"></div>
+      </div>
+
+      <p class="note">MathML support varies by browser. Best results on modern Chromium or Safari.</p>
+    </section>
+  </main>
+
+  <script src="mathtype-config.js"></script>
+  <script src="mathtype.js"></script>
+  <script>
+    (function () {
+      var input = document.getElementById('texInput');
+      var preview = document.getElementById('preview');
+      var mathmlOut = document.getElementById('mathmlOut');
+      var controls = document.getElementById('controls');
+      var renderBtn = document.getElementById('renderBtn');
+      var exportBtn = document.getElementById('exportBtn');
+      var samplesWrap = document.getElementById('samples');
+
+      var samples = [
+        { label: 'Fractions', tex: '\\frac{1}{2} + \\frac{a+b}{c-d}' },
+        { label: 'Scripts', tex: 'x_i^2 + y_{n+1}^{k-1}' },
+        { label: 'Roots', tex: '\\sqrt{a^2+b^2} = c' },
+        { label: 'Integrals', tex: '\\int_0^\\pi \\sin(x)\\,dx' },
+        { label: 'Sums', tex: '\\sum_{n=1}^{\\infty} \\frac{1}{n^2}' },
+        { label: 'Matrices', tex: '\\begin{pmatrix}1 & 2 \\\\ 3 & 4\\end{pmatrix}' },
+        { label: 'Cases', tex: 'f(x)=\\begin{cases}x^2 & x>0 \\\\ 0 & x\\le 0\\end{cases}' },
+        { label: 'Greek', tex: '\\alpha+\\beta=\\gamma, \\Delta x' },
+        { label: 'Fences', tex: '\\left( \\frac{a}{b} \\right]^{2}' }
+      ];
+
+      var FIELD_DEFS = [
+        { key: 'baseFontSize', label: 'Base font size (px)', type: 'number', min: 12, max: 48, step: 1 },
+        { key: 'mathFontFamily', label: 'Math font family', type: 'text' },
+        { key: 'uiFontFamily', label: 'UI font family', type: 'text' },
+        { key: 'scriptScale', label: 'Script scale', type: 'number', min: 0.3, max: 1, step: 0.05 },
+        { key: 'scriptMinSize', label: 'Script min size (px)', type: 'number', min: 6, max: 16, step: 1 },
+        { key: 'fracLineThickness', label: 'Fraction line (em)', type: 'number', min: 0.01, max: 0.2, step: 0.01 },
+        { key: 'fracNumAlign', label: 'Fraction numerator align', type: 'select', options: ['left', 'center', 'right'] },
+        { key: 'fracDenomAlign', label: 'Fraction denominator align', type: 'select', options: ['left', 'center', 'right'] },
+        { key: 'matrixRowGap', label: 'Matrix row gap (em)', type: 'number', min: 0, max: 1.5, step: 0.05 },
+        { key: 'matrixColGap', label: 'Matrix column gap (em)', type: 'number', min: 0, max: 1.5, step: 0.05 },
+        { key: 'fencePadding', label: 'Fence padding (em)', type: 'number', min: 0, max: 0.6, step: 0.02 },
+        { key: 'operatorSpacing', label: 'Operator spacing (em)', type: 'number', min: 0, max: 0.4, step: 0.01 },
+        { key: 'useOperatorSpacing', label: 'Use operator spacing', type: 'checkbox' },
+        { key: 'useMunderover', label: 'Use munderover for limits', type: 'checkbox' },
+        { key: 'thinSpace', label: 'Thin space (em)', type: 'number', min: 0, max: 0.3, step: 0.01 },
+        { key: 'mediumSpace', label: 'Medium space (em)', type: 'number', min: 0, max: 0.4, step: 0.01 },
+        { key: 'thickSpace', label: 'Thick space (em)', type: 'number', min: 0, max: 0.5, step: 0.01 },
+        { key: 'quad', label: 'Quad (em)', type: 'number', min: 0.5, max: 2, step: 0.1 },
+        { key: 'qquad', label: 'Qquad (em)', type: 'number', min: 1, max: 3, step: 0.1 },
+        { key: 'displayMode', label: 'Display mode', type: 'checkbox' }
+      ];
+
+      var currentConfig = MathType.setConfig(window.MathTypeConfig || {});
+
+      function applyTheme() {
+        document.body.style.fontFamily = currentConfig.uiFontFamily;
+      }
+
+      function updatePreview() {
+        MathType.setConfig(currentConfig);
+        var mathml = MathType.render(input.value, preview, currentConfig);
+        mathmlOut.textContent = mathml;
+        preview.style.fontSize = currentConfig.baseFontSize + 'px';
+        preview.style.fontFamily = currentConfig.mathFontFamily;
+      }
+
+      function buildControl(def) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'control';
+
+        var label = document.createElement('label');
+        label.textContent = def.label;
+        label.setAttribute('for', def.key);
+        wrapper.appendChild(label);
+
+        var inputEl;
+        if (def.type === 'select') {
+          inputEl = document.createElement('select');
+          def.options.forEach(function (opt) {
+            var option = document.createElement('option');
+            option.value = opt;
+            option.textContent = opt;
+            inputEl.appendChild(option);
+          });
+        } else if (def.type === 'checkbox') {
+          var checkboxWrap = document.createElement('div');
+          checkboxWrap.className = 'checkbox';
+          inputEl = document.createElement('input');
+          inputEl.type = 'checkbox';
+          checkboxWrap.appendChild(inputEl);
+          var checkboxLabel = document.createElement('span');
+          checkboxLabel.textContent = 'Enabled';
+          checkboxWrap.appendChild(checkboxLabel);
+          wrapper.appendChild(checkboxWrap);
+        } else {
+          inputEl = document.createElement('input');
+          inputEl.type = def.type || 'text';
+          if (def.min !== undefined) {
+            inputEl.min = def.min;
+          }
+          if (def.max !== undefined) {
+            inputEl.max = def.max;
+          }
+          if (def.step !== undefined) {
+            inputEl.step = def.step;
+          }
+        }
+
+        inputEl.id = def.key;
+        if (def.type !== 'checkbox') {
+          wrapper.appendChild(inputEl);
+        }
+
+        inputEl.value = currentConfig[def.key];
+        if (def.type === 'checkbox') {
+          inputEl.checked = !!currentConfig[def.key];
+        }
+
+        inputEl.addEventListener('input', function () {
+          if (def.type === 'checkbox') {
+            currentConfig[def.key] = inputEl.checked;
+          } else if (def.type === 'number') {
+            currentConfig[def.key] = parseFloat(inputEl.value);
+          } else {
+            currentConfig[def.key] = inputEl.value;
+          }
+          applyTheme();
+          updatePreview();
+        });
+
+        return wrapper;
+      }
+
+      function buildControls() {
+        controls.innerHTML = '';
+        FIELD_DEFS.forEach(function (def) {
+          controls.appendChild(buildControl(def));
+        });
+      }
+
+      function buildSamples() {
+        samplesWrap.innerHTML = '';
+        samples.forEach(function (sample) {
+          var btn = document.createElement('button');
+          btn.className = 'sample';
+          btn.type = 'button';
+          btn.textContent = sample.label;
+          btn.addEventListener('click', function () {
+            input.value = sample.tex;
+            updatePreview();
+          });
+          samplesWrap.appendChild(btn);
+        });
+      }
+
+      function exportConfig() {
+        var cleanConfig = {};
+        Object.keys(MathType.defaults).forEach(function (key) {
+          cleanConfig[key] = currentConfig[key];
+        });
+        var text = 'window.MathTypeConfig = ' + JSON.stringify(cleanConfig, null, 2) + ';\n';
+        var blob = new Blob([text], { type: 'application/javascript' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'mathtype-config.js';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      var renderTimeout;
+      input.value = samples[0].tex;
+      input.addEventListener('input', function () {
+        clearTimeout(renderTimeout);
+        renderTimeout = setTimeout(updatePreview, 120);
+      });
+
+      renderBtn.addEventListener('click', updatePreview);
+      exportBtn.addEventListener('click', exportConfig);
+
+      buildControls();
+      buildSamples();
+      applyTheme();
+      updatePreview();
+    })();
+  </script>
+</body>
+</html>
